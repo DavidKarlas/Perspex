@@ -9,6 +9,7 @@ using Perspex.Input.Raw;
 using Perspex.Platform;
 using Perspex.Input;
 using Action = System.Action;
+using System.Runtime.InteropServices;
 
 namespace Perspex.Gtk
 {
@@ -149,6 +150,26 @@ namespace Perspex.Gtk
                 _owner,
                 RawMouseEventType.LeftButtonDown,
                 new Point(evnt.X, evnt.Y), GetModifierKeys(evnt.State));
+            Input(e);
+            return true;
+        }
+
+        [DllImport("libgtk-win32-2.0-0.dll")]
+        extern static bool gdk_event_get_scroll_deltas(IntPtr eventScroll, out double deltaX, out double deltaY);
+
+        protected override bool OnScrollEvent(EventScroll evnt)
+        {
+            double dx, dy;
+            gdk_event_get_scroll_deltas(evnt.Handle, out dx, out dy);
+            dx /= -50;
+            dy /= -50;
+            var e = new RawMouseWheelEventArgs(
+                GtkMouseDevice.Instance,
+                evnt.Time,
+                _owner,
+                new Point(evnt.X, evnt.Y),
+                new Vector(dx, dy),
+                GetModifierKeys(evnt.State));
             Input(e);
             return true;
         }
