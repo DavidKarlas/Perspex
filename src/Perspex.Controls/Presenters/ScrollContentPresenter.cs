@@ -101,12 +101,15 @@ namespace Perspex.Controls.Presenters
 
         protected override void OnPointerWheelChanged(PointerWheelEventArgs e)
         {
-            if (Extent.Height > Viewport.Height)
+            if (Extent.Height > Viewport.Height || Extent.Width > Viewport.Width)
             {
                 var y = Offset.Y + (-e.Delta.Y * 50);
-                y = Math.Max(y, 0);
                 y = Math.Min(y, Extent.Height - Viewport.Height);
-                Offset = new Vector(Offset.X, y);
+                y = Math.Max(y, 0);
+                var x = Offset.X + (-e.Delta.X * 50);
+                x = Math.Min(x, Extent.Width - Viewport.Width);
+                x = Math.Max(x, 0);
+                Offset = new Vector(x, y);
                 e.Handled = true;
             }
         }
